@@ -9,23 +9,33 @@ namespace WorldServer
     {
         private readonly ILogger<WorldServerService> _logger;
         private readonly TcpListener _listener;
+        private readonly int _port = 5100;
 
         public WorldServerService(ILogger<WorldServerService> logger)
         {
             _logger = logger;
 
-            _listener = new TcpListener(IPAddress.Any, 5100);
+            _listener = new TcpListener(IPAddress.Any, _port);
         }
-
-        
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _listener.Start();
-
-            while (!stoppingToken.IsCancellationRequested)
+            _logger.LogInformation("Start TCP Server: {Port}", _port);
+            try
             {
-                var client = await _listener.AcceptTcpClientAsync(stoppingToken);
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    var client = await _listener.AcceptTcpClientAsync(stoppingToken);
+                    _logger.LogInformation("Client Connected : {EndPoint}", client.Client.RemoteEndPoint);
+
+                    var session = new SessionActor(client, _logger);
+                    session.Start();
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("WorldServerService Cancel graceful.");
             }
         }
 
