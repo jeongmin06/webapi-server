@@ -11,7 +11,7 @@ namespace DummyConsoleClient
     {
         public static async Task Main(string[] args)
         {
-            string host = "localhost";
+            string host = "server";
             int port = 5100;
 
             Console.WriteLine($"[CLIENT] Target : {host}:{port}");

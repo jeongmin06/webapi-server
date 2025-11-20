@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  server:
+    build:
+      context: ./WorldServer
+      dockerfile: Dockerfile
+    container_name: world-server
+    ports:
+      - "5100:5100"
+    restart: unless-stopped
+
+  client1:
+    build:
+      context: ./DummyConsoleClient
+      dockerfile: Dockerfile
+    container_name: ping-client-1
+    depends_on:
+      - server
+    restart: unless-stopped
+
+  client2:
+    build:
+      context: ./DummyConsoleClient
+      dockerfile: Dockerfile
+    container_name: ping-client-2
+    depends_on:
+      - server
+    restart: unless-stopped
